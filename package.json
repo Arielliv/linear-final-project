@@ -1,0 +1,26 @@
+{
+  "name": "linear-final-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arielliv/linear-final-project.git"
+  },
+  "author": "ariell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arielliv/linear-final-project/issues"
+  },
+  "homepage": "https://github.com/Arielliv/linear-final-project#readme",
+  "dependencies": {
+    "@stdlib/stdlib": "^0.0.96",
+    "@stdlib/types": "^0.0.14",
+    "@stdlib/utils-compact-adjacency-matrix": "^0.0.6",
+    "lodash": "^4.17.21"
+  }
+}
