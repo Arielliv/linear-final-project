@@ -9,6 +9,7 @@ import {
     getStationaryProbabilityVector, matrixMulVector,
     randomWalk, toFixVector
 } from "./Utils/graphUtils";
+import * as bigInt from "big-integer";
 
 
 const cliqueGraph = createCliqueGraph(0, MAX_NUMBER);
@@ -16,22 +17,63 @@ const doubleCliqueLinkedByPathGraph = createDoubleCliqueLinkedByPathGraph(MAX_NU
 const ringGraph = createRingGraph(0, MAX_NUMBER);
 const lollipopGraph = createLollipopGraph(MAX_NUMBER);
 
+let sum = bigInt(0);
+let sum2 = bigInt(0);
 //1.
 // cliqueGraph experiments:
-console.log(`randomWalk of cliqueGraph: ${randomWalk(cliqueGraph, 0)}\n`);
+console.log(`cliqueGraph:`);
+for (let i = 0; i < 10; i++) {
+    let result = randomWalk(cliqueGraph, 0);
+    sum = sum.add(result);
+    console.log(`randomWalk (run number #${i}): ${result}`);
+
+}
+console.log(`avg.: ${sum.divide(10)}\n`);
+sum = bigInt(0);
 
 // ringGraph experiments:
-console.log(`randomWalk of ringGraph when vertex is 0: ${randomWalk(ringGraph, 0)}\n`);
+console.log(`ringGraph`);
+for (let i = 0; i < 10; i++) {
+    let result = randomWalk(ringGraph, 0);
+    sum = sum.add(result);
+    console.log(`randomWalk (run number #${i}): ${result}`);
+}
+
+console.log(`avg.: ${sum.divide(10)}\n`);
+sum = bigInt(0);
 
 // lollipopGraph experiments:
-console.log(`randomWalk of lollipopGraph when vertex is 0: ${randomWalk(lollipopGraph, 0)}\n`);
-console.log(`randomWalk of lollipopGraph when vertex is ${MAX_NUMBER - 1}: ${randomWalk(lollipopGraph, MAX_NUMBER - 1)}\n`);
+console.log(`lollipopGraph`);
+for (let i = 0; i < 10; i++) {
+    let result1 = randomWalk(lollipopGraph, 0);
+    let result2 = randomWalk(lollipopGraph, MAX_NUMBER - 1);
+    sum = sum.add(result1);
+    sum2 = sum2.add(result2)
+    console.log(`randomWalk (run number #${i}) when vertex is 0: ${randomWalk(lollipopGraph, 0)}`);
+    console.log(`randomWalk (run number #${i}) when vertex is ${MAX_NUMBER - 1}: ${result2}`);
+}
+console.log(`avg.: ${sum.divide(10)}`);
+console.log(`avg.: ${sum2.divide(10)}\n`);
+sum = bigInt(0);
+sum2 = bigInt(0);
 
 // doubleCliqueLinkedByPathGraph experiments:
-console.log(`randomWalk of doubleCliqueLinkedByPathGraph when vertex is 0: ${randomWalk(doubleCliqueLinkedByPathGraph, 0)}\n`);
-console.log(`randomWalk of doubleCliqueLinkedByPathGraph when vertex is ${MAX_NUMBER - 1}: ${randomWalk(doubleCliqueLinkedByPathGraph, MAX_NUMBER - 1)}\n`);
+console.log(`doubleCliqueLinkedByPathGraph`);
+for (let i = 0; i < 10; i++) {
+    let result1 = randomWalk(doubleCliqueLinkedByPathGraph, 0);
+    let result2 = randomWalk(doubleCliqueLinkedByPathGraph, MAX_NUMBER - 1);
+    sum = sum.add(result1);
+    sum2 = sum2.add(result2)
+    console.log(`randomWalk (run number #${i}) when vertex is 0: ${result1}`);
+    console.log(`randomWalk (run number #${i}) when vertex is ${MAX_NUMBER - 1}: ${result2}`);
+}
+console.log(`avg.: ${sum.divide(10)}`);
+console.log(`avg.: ${sum2.divide(10)}\n`);
+sum = bigInt(0);
+sum2 = bigInt(0);
 
-// //2.
+
+//2.
 // cliqueGraph experiments:
 console.log('cliqueGraph:');
 console.log(`StationaryProbabilityVector: [${getStationaryProbabilityVector(getNormalAdjacencyMatrix(cliqueGraph))}]`);

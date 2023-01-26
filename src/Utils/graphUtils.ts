@@ -73,40 +73,6 @@ export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number): BigNu
     return coverTime;
 }
 
-// export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
-//     let sum = 0;
-//
-//     let ans = eigs(normalAdjacencyMatrix);
-//     let vectorIndex = -1;
-//
-//     ans.values.map((num, index) => {
-//         // if (Math.trunc(num * 100) / 100 === 1) {
-//         //     vectorIndex = index;
-//         // }
-//         if (parseFloat(num.toFixed(2)) === 1) {
-//             vectorIndex = index;
-//         }
-//     })
-//
-//     if (vectorIndex === -1) {
-//         return []
-//     }
-//
-//     let pi;
-//     ans.vectors.forEach((a, index) => {
-//         if (index === vectorIndex) {
-//             pi = a;
-//         }
-//     })
-//
-//     pi.map((i) => sum += i);
-//
-//     pi = pi.map(value => {
-//         return parseFloat((parseFloat(value) / sum).toFixed(2));
-//     })
-//     return pi;
-// }
-
 export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
     let sum = 0;
 
