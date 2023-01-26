@@ -6,6 +6,7 @@ import {BigNumber} from "big-integer";
 import {EigenvalueDecomposition, inverse, Matrix} from "ml-matrix";
 import {MAX_FLOATING_NUMBER} from "../Constants/Constants";
 
+const N_Values = [4, 8, 16, 32, 64];
 
 export const createClique = (graph: CompactAdjacencyMatrix, offset: number, n: number) => {
     for (let i = offset; i < n; i++) {
@@ -52,7 +53,7 @@ export const getNormalAdjacencyMatrix = (graph: CompactAdjacencyMatrix): number[
     return normalCompactAdjacencyMatrix;
 }
 
-export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number): BigNumber => {
+export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number, t?: number): { coverTime: BigNumber, endVertex: number } => {
     let coverTime = bigInt(1);
 
     let curNeighbors: number[];
@@ -62,7 +63,7 @@ export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number): BigNu
     const visitedArray = new Array(graph.getMatrixSize()).fill(0);
     visitedArray[curVertex] = 1;
 
-    while (!isVisitedAll(visitedArray)) {
+    while (!isVisitedAll(visitedArray) && coverTime.valueOf() != t) {
         curNeighbors = graph.getNeighbors(curVertex);
         nextVertexPlaceInNeighborsArray = getRandomNumber(curNeighbors.length);
         nextVertex = curNeighbors[nextVertexPlaceInNeighborsArray];
@@ -70,7 +71,7 @@ export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number): BigNu
         curVertex = nextVertex;
         coverTime = coverTime.add(1);
     }
-    return coverTime;
+    return {coverTime, endVertex: curVertex};
 }
 
 export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
@@ -124,13 +125,29 @@ export const arraysEqual = (a, b) => {
     if (a == null || b == null) return false;
     if (a.length !== b.length) return false;
 
-    // If you don't care about the order of the elements inside
-    // the array, you should sort both arrays here.
-    // Please note that calling sort on an array will modify that array.
-    // you might want to clone your array first.
-
     for (var i = 0; i < a.length; ++i) {
         if (a[i] !== b[i]) return false;
     }
     return true;
+}
+
+export const pageRank = ({
+                             graph,
+                             vertex,
+                             t,
+
+                         }: { graph: CompactAdjacencyMatrix, vertex: number, t: number }): void => {
+    for (let j = 0; j < N_Values.length; j++) {
+        const visitedArray = new Array(graph.getMatrixSize()).fill(0);
+        const N = N_Values[j];
+
+        for (let i = 0; i < t; i++) {
+            const res = randomWalk(graph, vertex, N);
+            visitedArray[res.endVertex]++;
+        }
+
+        console.log(`histograma of pagerank with N=${N} : [${visitedArray}]`)
+        console.log(`histograma of pagerank with N=${N} : [${visitedArray.map((a) => a / t)}]`)
+    }
+
 }
