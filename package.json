@@ -21,6 +21,10 @@
     "@stdlib/stdlib": "^0.0.96",
     "@stdlib/types": "^0.0.14",
     "@stdlib/utils-compact-adjacency-matrix": "^0.0.6",
-    "lodash": "^4.17.21"
+    "big-integer": "^1.6.51",
+    "lodash": "^4.17.21",
+    "mathjs": "^11.5.0",
+    "ml-matrix": "^6.10.4",
+    "numeric": "^1.2.6"
   }
 }

@@ -8,5 +8,7 @@ export const createRingGraph = (offset: number, n: number) => {
         graph.addEdge(i, i);
     }
     graph.addEdge(n - 1, n - 1);
+    graph.addEdge(n - 1, n - 2);
+    graph.addEdge(n - 1, 0);
     return graph;
 }

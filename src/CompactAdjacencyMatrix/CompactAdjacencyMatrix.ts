@@ -12,15 +12,33 @@ export class CompactAdjacencyMatrix {
         this.matrix[i][j] = 1;
     }
 
-    public getEdge(i: number, j: number): number {
-        return this.matrix[i][j];
+    public isEdgeExists(i: number, j: number): boolean {
+        return this.matrix[i][j] === 1;
+    }
+
+    public getMatrixSize(): number {
+        return this.n;
+    }
+
+    public getMatrix(): number[][] {
+        return this.matrix;
+    }
+
+    public getNeighbors(vertex: number): number[] {
+        const neighbors = [];
+        for (let i = 0; i < this.n; i++) {
+            if (this.isEdgeExists(i, vertex)) {
+                neighbors.push(i);
+            }
+        }
+        return neighbors;
     }
 
     public edges(): string {
         let edgesStr = '';
         for (let i = 0; i < this.n; i++) {
             for (let j = 0; j < this.n; j++) {
-                if (this.getEdge(i, j) === 1) {
+                if (this.isEdgeExists(i, j)) {
                     edgesStr += `[ ${i},${j} ] `;
                 }
             }
