@@ -1,6 +1,5 @@
 import {randomWalk} from "../Utils/graphUtils";
 import * as bigInt from "big-integer";
-import {CompactAdjacencyMatrix} from "../CompactAdjacencyMatrix/CompactAdjacencyMatrix";
 import {MAX_NUMBER} from "../Constants/Constants";
 import {algoRunParams} from "../types/types";
 

@@ -17,48 +17,56 @@ export const PageRankRun = ({
 //2.a
 // cliqueGraph experiments:
     console.log('cliqueGraph:');
-    console.log(`StationaryProbabilityVector: [${getStationaryProbabilityVector(getNormalAdjacencyMatrix(cliqueGraph))}]`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(matrixMulVector(getNormalAdjacencyMatrix(cliqueGraph), getStationaryProbabilityVector(getNormalAdjacencyMatrix(cliqueGraph))).getColumn(0), getStationaryProbabilityVector(getNormalAdjacencyMatrix(cliqueGraph)))}\n`);
+    let StationaryProbabilityVector = getStationaryProbabilityVector(getNormalAdjacencyMatrix(cliqueGraph));
+    let checkVector = matrixMulVector(getNormalAdjacencyMatrix(cliqueGraph), StationaryProbabilityVector).getColumn(0);
+    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(checkVector, StationaryProbabilityVector)}\n`);
 
 // ringGraph experiments:
     console.log('ringGraph:');
-    console.log(`StationaryProbabilityVector: [${getStationaryProbabilityVector(getNormalAdjacencyMatrix(ringGraph))}]`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(matrixMulVector(getNormalAdjacencyMatrix(ringGraph), getStationaryProbabilityVector(getNormalAdjacencyMatrix(ringGraph))).getColumn(0), getStationaryProbabilityVector(getNormalAdjacencyMatrix(ringGraph)))}\n`);
+    StationaryProbabilityVector = getStationaryProbabilityVector(getNormalAdjacencyMatrix(ringGraph));
+    checkVector = matrixMulVector(getNormalAdjacencyMatrix(ringGraph), StationaryProbabilityVector).getColumn(0);
+    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(checkVector, StationaryProbabilityVector)}\n`);
 
 // lollipopGraph experiments:
     console.log('lollipopGraph:');
-    console.log(`StationaryProbabilityVector: [${getStationaryProbabilityVector(getNormalAdjacencyMatrix(lollipopGraph))}]\n`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(toFixVector(matrixMulVector(getNormalAdjacencyMatrix(lollipopGraph), getStationaryProbabilityVector(getNormalAdjacencyMatrix(lollipopGraph))).getColumn(0)), getStationaryProbabilityVector(getNormalAdjacencyMatrix(lollipopGraph)))}\n`);
+    StationaryProbabilityVector = getStationaryProbabilityVector(getNormalAdjacencyMatrix(ringGraph));
+    checkVector = matrixMulVector(getNormalAdjacencyMatrix(lollipopGraph), StationaryProbabilityVector).getColumn(0);
+    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(toFixVector(checkVector), StationaryProbabilityVector)}\n`);
 
 // doubleCliqueLinkedByPathGraph experiments:
     console.log('doubleCliqueLinkedByPathGraph:');
-    console.log(`StationaryProbabilityVector: [${getStationaryProbabilityVector(getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph))}]\n`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(toFixVector(matrixMulVector(getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph), getStationaryProbabilityVector(getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph))).getColumn(0)), getStationaryProbabilityVector(getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph)))}\n`);
+    StationaryProbabilityVector = getStationaryProbabilityVector(getNormalAdjacencyMatrix(ringGraph));
+    checkVector = matrixMulVector(getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph), StationaryProbabilityVector).getColumn(0);
+    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(toFixVector(checkVector), StationaryProbabilityVector)}\n`);
 
 
 //2.b
 // cliqueGraph experiments:
     console.log('cliqueGraph:');
-    pageRank({graph: cliqueGraph, vertex: 0, t: 1000000});
+    pageRank({graph: cliqueGraph, vertex: 0, t: 10000});
     console.log('\n');
 
 // ringGraph experiments:
     console.log('ringGraph:');
-    pageRank({graph: ringGraph, vertex: 0, t: 1000000});
+    pageRank({graph: ringGraph, vertex: 0, t: 10000});
     console.log('\n');
 
 // lollipopGraph experiments:
     console.log('lollipopGraph:');
-    pageRank({graph: lollipopGraph, vertex: 0, t: 1000000});
+    pageRank({graph: lollipopGraph, vertex: 0, t: 10000});
     console.log('\n');
-    pageRank({graph: lollipopGraph, vertex: MAX_NUMBER - 1, t: 1000000});
+    pageRank({graph: lollipopGraph, vertex: MAX_NUMBER - 1, t: 10000});
     console.log('\n');
 
 // doubleCliqueLinkedByPathGraph experiments:
     console.log('doubleCliqueLinkedByPathGraph:');
-    pageRank({graph: doubleCliqueLinkedByPathGraph, vertex: 0, t: 1000000});
+    pageRank({graph: doubleCliqueLinkedByPathGraph, vertex: 0, t: 10000});
     console.log('\n');
-    pageRank({graph: doubleCliqueLinkedByPathGraph, vertex: MAX_NUMBER - 1, t: 1000000});
+    pageRank({graph: doubleCliqueLinkedByPathGraph, vertex: MAX_NUMBER - 1, t: 10000});
     console.log('\n');
 
 }

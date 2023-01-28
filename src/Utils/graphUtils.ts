@@ -1,9 +1,11 @@
 import {CompactAdjacencyMatrix} from "../CompactAdjacencyMatrix/CompactAdjacencyMatrix";
 import {getRandomNumber} from "./utils";
-import bigInt = require("big-integer");
 import {BigNumber} from "big-integer";
 import {EigenvalueDecomposition, Matrix} from "ml-matrix";
 import {MAX_FLOATING_NUMBER} from "../Constants/Constants";
+import bigInt = require("big-integer");
+import {getRandomVector, getVectorNorma, isDistanceBetweenTwoVectorsSmallerThen} from "./linearUtils";
+
 
 const tf = require("@tensorflow/tfjs-node");
 
@@ -122,7 +124,6 @@ export const toFixVector = (vector: number[]): number[] => {
 }
 
 
-
 export const pageRank = ({
                              graph,
                              vertex,
@@ -143,28 +144,6 @@ export const pageRank = ({
 
 }
 
-export const getRandomVector = (n: number): Matrix => {
-    const randomVector = [];
-    for (let i = 0; i < n; i++) {
-        randomVector.push(getRandomNumber(n));
-    }
-    return new Matrix([randomVector]);
-}
-
-export const isDistanceBetweenTwoVectorsSmallerThen = (u: Matrix, v: Matrix, delta: number): boolean => {
-    // console.log('nextU sub', u);
-    // console.log('currentU sub', v);
-    // console.log('sub', getVectorNorma((Matrix.sub(u, v))))
-    return getVectorNorma((Matrix.sub(u, v))) < delta;
-}
-
-export const getVectorNorma = (initVector?: Matrix) => {
-    let sum = 0
-    initVector.getColumn(0).map((val) => {
-        sum += Math.pow(val, 2);
-    });
-    return Math.sqrt(sum);
-}
 
 export const powerIteration = ({
                                    graph,
@@ -172,8 +151,6 @@ export const powerIteration = ({
                                    t, initVector
                                }: { graph: CompactAdjacencyMatrix, delta: number, t: number, initVector?: Matrix }): Matrix => {
     let initialU = initVector || getRandomVector(graph.getMatrixSize()).transpose();
-    //for testing
-    // let initialU = new Matrix([[3], [3], [3], [2]]);
     const A = new Matrix(graph.getMatrix());
     let v: Matrix;
 
@@ -182,46 +159,48 @@ export const powerIteration = ({
 
     for (let i = 0; i < t; i++) {
         v = A.mmul(currentU);
-        const norma = getVectorNorma(v);
-        // console.log('currentU', currentU);
-        // console.log('v', v);
-        // console.log('norma', norma)
-        nextU = v.divide(norma);
-        // console.log('nextU', nextU)
 
+        const norma = getVectorNorma(v.getColumn(0));
+        nextU = v.divide(norma);
         if (isDistanceBetweenTwoVectorsSmallerThen(nextU, currentU, delta)) {
             break;
         }
 
         currentU = nextU;
     }
-    // console.log(nextU)
     return nextU;
 }
 
 export const gramSchmidtAlgo = async (span: number[][]): Promise<number[][]> => {
+    const res = [];
     const input = tf.tensor2d(span);
-
-    return tf.linalg.gramSchmidt(input).array();
+    const p = (await (await tf.linalg.gramSchmidt(input)).array());
+    p.map((col: number[], index) => {
+        if (!col.includes(Number.NaN)) {
+            res.push(col);
+        }
+    })
+    return res;
 
 }
 
 export const getVectorProjectionOnSpan = (span: number[][], vector: Matrix): Matrix => {
     let A = new Matrix(span);
-    let sum = new Matrix(1, span[0].length);
+    let projVector = new Matrix(1, span[0].length);
 
     for (let i = 0; i < A.rows; i++) {
-        let colMatrix = new Matrix([A.getRow(i)]);
+        let rowMatrix = new Matrix([A.getRow(i)]);
 
-        let numerator = (colMatrix).mmul(vector).getColumn(0)[0];
+        let numerator = (rowMatrix).mmul(vector).getColumn(0)[0];
 
-        let denominator = Math.pow((getVectorNorma(colMatrix)), 2)
+        let denominator = Math.pow((getVectorNorma(rowMatrix.getRow(0))), 2)
 
         let fraction = numerator / denominator;
 
-        sum.add(colMatrix.mul(fraction));
+        projVector.add(rowMatrix.mul(fraction));
     }
-    return sum;
+
+    return projVector;
 }
 
 export const generalizedPowerIteration = async ({
@@ -230,21 +209,23 @@ export const generalizedPowerIteration = async ({
                                                     kBiggestEigenvector
                                                 }: { graph: CompactAdjacencyMatrix, delta: number, kBiggestEigenvector: number }) => {
     const spanU: number[][] = [];
-    let nextU: Matrix;
+    const V = powerIteration({graph, delta, t: 10000});
+    spanU.push(V.getColumn(0));
+
+    let W = getRandomVector(graph.getMatrixSize()).transpose();
+
+    let projWOnSpan = getVectorProjectionOnSpan((spanU), W).transpose();
+    let curU = W.sub(projWOnSpan);
+    let curV = curU;
 
     for (let i = 0; i < kBiggestEigenvector; i++) {
-        let curU = powerIteration({graph, delta, t: 50, initVector: nextU});
+        curU = powerIteration({graph, delta, t: 50, initVector: curV});
         spanU.push(curU.getColumn(0));
-        // let curW = getRandomVector(graph.getMatrixSize()).transpose();
-
-        // for testing
-        let curW = new Matrix([[3], [3], [3], [2]]);
         const orthogonalBasisOfSpanU = await gramSchmidtAlgo(spanU);
-        const projWOnSpan = getVectorProjectionOnSpan((orthogonalBasisOfSpanU), curW).transpose();
-        console.log('projWOnSpan', projWOnSpan)
-        nextU = curW.sub(projWOnSpan);
-    }
-    return nextU;
-    // console.log(nextU);
+        projWOnSpan = getVectorProjectionOnSpan((orthogonalBasisOfSpanU), W).transpose();
 
+        curV = W.sub(projWOnSpan);
+    }
+
+    return curV;
 }

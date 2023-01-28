@@ -1,6 +1,6 @@
 import {CompactAdjacencyMatrix} from "../CompactAdjacencyMatrix/CompactAdjacencyMatrix";
 
-export const createRingGraph = (offset: number, n: number) => {
+export const createRingGraph = (n: number, offset = 0) => {
     let graph = new CompactAdjacencyMatrix(n);
     for (let i = offset; i < n - 1; i++) {
         graph.addEdge(i, Math.floor((i + 1) % n));
