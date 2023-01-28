@@ -5,7 +5,7 @@ import {BigNumber} from "big-integer";
 import {EigenvalueDecomposition, Matrix} from "ml-matrix";
 import {MAX_FLOATING_NUMBER} from "../Constants/Constants";
 
-const tf = require("@tensorflow/tfjs");
+const tf = require("@tensorflow/tfjs-node");
 
 const N_Values = [4, 8, 16, 32, 64];
 
@@ -121,16 +121,7 @@ export const toFixVector = (vector: number[]): number[] => {
     return vector.map((num) => parseFloat(num.toFixed(MAX_FLOATING_NUMBER)));
 }
 
-export const arraysEqual = (a, b) => {
-    if (a === b) return true;
-    if (a == null || b == null) return false;
-    if (a.length !== b.length) return false;
 
-    for (let i = 0; i < a.length; ++i) {
-        if (a[i] !== b[i]) return false;
-    }
-    return true;
-}
 
 export const pageRank = ({
                              graph,
