@@ -2,9 +2,10 @@ import {CompactAdjacencyMatrix} from "../CompactAdjacencyMatrix/CompactAdjacency
 import {getRandomNumber} from "./utils";
 import bigInt = require("big-integer");
 import {BigNumber} from "big-integer";
-// import {eigs} from "mathjs"
-import {EigenvalueDecomposition, inverse, Matrix} from "ml-matrix";
+import {EigenvalueDecomposition, Matrix} from "ml-matrix";
 import {MAX_FLOATING_NUMBER} from "../Constants/Constants";
+
+const tf = require("@tensorflow/tfjs");
 
 const N_Values = [4, 8, 16, 32, 64];
 
@@ -76,26 +77,26 @@ export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number, t?: nu
 
 export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
     let sum = 0;
-
-    let A = new Matrix(normalAdjacencyMatrix);
-    const e = new EigenvalueDecomposition(A);
-    const real = e.realEigenvalues;
-
     let vectorIndex = -1;
 
-    real.map((num, index) => {
+    let A = new Matrix(normalAdjacencyMatrix);
+    const res = new EigenvalueDecomposition(A);
+
+    const eigenvalues = res.realEigenvalues;
+
+    eigenvalues.map((num, index) => {
         if (parseFloat(num.toFixed(2)) === 1) {
             vectorIndex = index;
         }
     })
 
     if (vectorIndex === -1) {
-        return []
+        return [];
     }
 
+    const eigenvectors = res.eigenvectorMatrix;
 
-    const vectors = e.eigenvectorMatrix;
-    let pi = vectors.getColumn(vectorIndex)
+    let pi = eigenvectors.getColumn(vectorIndex)
     pi.map((i) => sum += i);
 
     pi = pi.map(value => {
@@ -125,7 +126,7 @@ export const arraysEqual = (a, b) => {
     if (a == null || b == null) return false;
     if (a.length !== b.length) return false;
 
-    for (var i = 0; i < a.length; ++i) {
+    for (let i = 0; i < a.length; ++i) {
         if (a[i] !== b[i]) return false;
     }
     return true;
@@ -135,7 +136,6 @@ export const pageRank = ({
                              graph,
                              vertex,
                              t,
-
                          }: { graph: CompactAdjacencyMatrix, vertex: number, t: number }): void => {
     for (let j = 0; j < N_Values.length; j++) {
         const visitedArray = new Array(graph.getMatrixSize()).fill(0);
@@ -149,5 +149,111 @@ export const pageRank = ({
         console.log(`histograma of pagerank with N=${N} : [${visitedArray}]`)
         console.log(`histograma of pagerank with N=${N} : [${visitedArray.map((a) => a / t)}]`)
     }
+
+}
+
+export const getRandomVector = (n: number): Matrix => {
+    const randomVector = [];
+    for (let i = 0; i < n; i++) {
+        randomVector.push(getRandomNumber(n));
+    }
+    return new Matrix([randomVector]);
+}
+
+export const isDistanceBetweenTwoVectorsSmallerThen = (u: Matrix, v: Matrix, delta: number): boolean => {
+    // console.log('nextU sub', u);
+    // console.log('currentU sub', v);
+    // console.log('sub', getVectorNorma((Matrix.sub(u, v))))
+    return getVectorNorma((Matrix.sub(u, v))) < delta;
+}
+
+export const getVectorNorma = (initVector?: Matrix) => {
+    let sum = 0
+    initVector.getColumn(0).map((val) => {
+        sum += Math.pow(val, 2);
+    });
+    return Math.sqrt(sum);
+}
+
+export const powerIteration = ({
+                                   graph,
+                                   delta,
+                                   t, initVector
+                               }: { graph: CompactAdjacencyMatrix, delta: number, t: number, initVector?: Matrix }): Matrix => {
+    let initialU = initVector || getRandomVector(graph.getMatrixSize()).transpose();
+    //for testing
+    // let initialU = new Matrix([[3], [3], [3], [2]]);
+    const A = new Matrix(graph.getMatrix());
+    let v: Matrix;
+
+    let currentU = initialU;
+    let nextU: Matrix;
+
+    for (let i = 0; i < t; i++) {
+        v = A.mmul(currentU);
+        const norma = getVectorNorma(v);
+        // console.log('currentU', currentU);
+        // console.log('v', v);
+        // console.log('norma', norma)
+        nextU = v.divide(norma);
+        // console.log('nextU', nextU)
+
+        if (isDistanceBetweenTwoVectorsSmallerThen(nextU, currentU, delta)) {
+            break;
+        }
+
+        currentU = nextU;
+    }
+    // console.log(nextU)
+    return nextU;
+}
+
+export const gramSchmidtAlgo = async (span: number[][]): Promise<number[][]> => {
+    const input = tf.tensor2d(span);
+
+    return tf.linalg.gramSchmidt(input).array();
+
+}
+
+export const getVectorProjectionOnSpan = (span: number[][], vector: Matrix): Matrix => {
+    let A = new Matrix(span);
+    let sum = new Matrix(1, span[0].length);
+
+    for (let i = 0; i < A.rows; i++) {
+        let colMatrix = new Matrix([A.getRow(i)]);
+
+        let numerator = (colMatrix).mmul(vector).getColumn(0)[0];
+
+        let denominator = Math.pow((getVectorNorma(colMatrix)), 2)
+
+        let fraction = numerator / denominator;
+
+        sum.add(colMatrix.mul(fraction));
+    }
+    return sum;
+}
+
+export const generalizedPowerIteration = async ({
+                                                    graph,
+                                                    delta,
+                                                    kBiggestEigenvector
+                                                }: { graph: CompactAdjacencyMatrix, delta: number, kBiggestEigenvector: number }) => {
+    const spanU: number[][] = [];
+    let nextU: Matrix;
+
+    for (let i = 0; i < kBiggestEigenvector; i++) {
+        let curU = powerIteration({graph, delta, t: 50, initVector: nextU});
+        spanU.push(curU.getColumn(0));
+        // let curW = getRandomVector(graph.getMatrixSize()).transpose();
+
+        // for testing
+        let curW = new Matrix([[3], [3], [3], [2]]);
+        const orthogonalBasisOfSpanU = await gramSchmidtAlgo(spanU);
+        const projWOnSpan = getVectorProjectionOnSpan((orthogonalBasisOfSpanU), curW).transpose();
+        console.log('projWOnSpan', projWOnSpan)
+        nextU = curW.sub(projWOnSpan);
+    }
+    return nextU;
+    // console.log(nextU);
 
 }
