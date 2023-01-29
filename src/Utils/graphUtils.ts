@@ -4,10 +4,12 @@ import {BigNumber} from "big-integer";
 import {EigenvalueDecomposition, Matrix} from "ml-matrix";
 import {MAX_FLOATING_NUMBER} from "../Constants/Constants";
 import bigInt = require("big-integer");
-import {getRandomVector, getVectorNorma, isDistanceBetweenTwoVectorsSmallerThen} from "./linearUtils";
-
-
-const tf = require("@tensorflow/tfjs-node");
+import {
+    getRandomVector,
+    getVectorNorma,
+    getVectorProjectionOnSpan, gramSchmidtAlgo,
+    isDistanceBetweenTwoVectorsSmallerThen
+} from "./linearUtils";
 
 const N_Values = [4, 8, 16, 32, 64];
 
@@ -112,13 +114,6 @@ export const getProbabilityVector = (n: number, index: number) => {
     probabilityVector[index] = 1;
 }
 
-export const matrixMulVector = (normalAdjacencyMatrix: number[][], vector: number[]): Matrix => {
-    let A = new Matrix(normalAdjacencyMatrix);
-    let B = new Matrix([vector]);
-
-    return A.mmul(B.transpose());
-};
-
 export const toFixVector = (vector: number[]): number[] => {
     return vector.map((num) => parseFloat(num.toFixed(MAX_FLOATING_NUMBER)));
 }
@@ -171,37 +166,7 @@ export const powerIteration = ({
     return nextU;
 }
 
-export const gramSchmidtAlgo = async (span: number[][]): Promise<number[][]> => {
-    const res = [];
-    const input = tf.tensor2d(span);
-    const p = (await (await tf.linalg.gramSchmidt(input)).array());
-    p.map((col: number[], index) => {
-        if (!col.includes(Number.NaN)) {
-            res.push(col);
-        }
-    })
-    return res;
 
-}
-
-export const getVectorProjectionOnSpan = (span: number[][], vector: Matrix): Matrix => {
-    let A = new Matrix(span);
-    let projVector = new Matrix(1, span[0].length);
-
-    for (let i = 0; i < A.rows; i++) {
-        let rowMatrix = new Matrix([A.getRow(i)]);
-
-        let numerator = (rowMatrix).mmul(vector).getColumn(0)[0];
-
-        let denominator = Math.pow((getVectorNorma(rowMatrix.getRow(0))), 2)
-
-        let fraction = numerator / denominator;
-
-        projVector.add(rowMatrix.mul(fraction));
-    }
-
-    return projVector;
-}
 
 export const generalizedPowerIteration = async ({
                                                     graph,
