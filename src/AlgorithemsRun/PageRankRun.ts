@@ -1,7 +1,7 @@
 import {
     getNormalAdjacencyMatrix,
     getStationaryProbabilityVector,
-    pageRank, toFixVector
+    pageRank, stationaryProbabilityVectorCheck, toFixVector
 } from "../Utils/graphUtils";
 
 import {MAX_NUMBER} from "../Constants/Constants";
@@ -20,45 +20,40 @@ export const PageRankRun = ({
     let checkVector;
 //2.a
 // cliqueGraph experiments:
-    console.log('cliqueGraph:');
+//     console.log('cliqueGraph:');
 
-    normalAdjacencyMatrix = getNormalAdjacencyMatrix(cliqueGraph);
-    StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
-    checkVector = matrixMulVector(normalAdjacencyMatrix, StationaryProbabilityVector).getColumn(0);
+    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(cliqueGraph);
+    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
 
-    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(checkVector, StationaryProbabilityVector)}\n`);
+    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
 
 // ringGraph experiments:
-    console.log('ringGraph:');
+//     console.log('ringGraph:');
 
-    normalAdjacencyMatrix = getNormalAdjacencyMatrix(ringGraph);
-    StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
-    checkVector = matrixMulVector(normalAdjacencyMatrix, StationaryProbabilityVector).getColumn(0);
+    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(ringGraph);
+    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
 
-    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(checkVector, StationaryProbabilityVector)}\n`);
+    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
 
 // lollipopGraph experiments:
-    console.log('lollipopGraph:');
+//     console.log('lollipopGraph:');
 
-    normalAdjacencyMatrix = getNormalAdjacencyMatrix(lollipopGraph);
-    StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
-    checkVector = matrixMulVector(normalAdjacencyMatrix, StationaryProbabilityVector).getColumn(0);
+    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(lollipopGraph);
+    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
 
-    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(toFixVector(checkVector), StationaryProbabilityVector)}\n`);
+    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
 
 // doubleCliqueLinkedByPathGraph experiments:
-    console.log('doubleCliqueLinkedByPathGraph:');
+//     console.log('doubleCliqueLinkedByPathGraph:');
 
-    normalAdjacencyMatrix = getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph);
-    StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
-    checkVector = matrixMulVector(normalAdjacencyMatrix, StationaryProbabilityVector).getColumn(0);
+    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph);
+    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
 
-    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    console.log(`StationaryProbabilityVector is eq: ${arraysEqual(toFixVector(checkVector), StationaryProbabilityVector)}\n`);
-
+    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
 
 //2.b
 // cliqueGraph experiments:

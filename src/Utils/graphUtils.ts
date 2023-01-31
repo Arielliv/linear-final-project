@@ -1,17 +1,19 @@
 import {CompactAdjacencyMatrix} from "../CompactAdjacencyMatrix/CompactAdjacencyMatrix";
-import {getRandomNumber} from "./utils";
+import {arraysEqual, getRandomNumber} from "./utils";
 import {BigNumber} from "big-integer";
 import {EigenvalueDecomposition, Matrix} from "ml-matrix";
-import {MAX_FLOATING_NUMBER} from "../Constants/Constants";
-import bigInt = require("big-integer");
+import {MAX_FLOATING_NUMBER, N_Values} from "../Constants/Constants";
 import {
+    getNormalizedVector,
     getRandomVector,
     getVectorNorma,
-    getVectorProjectionOnSpan, gramSchmidtAlgo,
-    isDistanceBetweenTwoVectorsSmallerThen
+    getVectorProjectionOnSpan,
+    gramSchmidtAlgo,
+    isDistanceBetweenTwoVectorsSmallerThen, matrixMulVector
 } from "./linearUtils";
+import bigInt = require("big-integer");
 
-const N_Values = [4, 8, 16, 32, 64];
+
 
 export const createClique = (graph: CompactAdjacencyMatrix, offset: number, n: number) => {
     for (let i = offset; i < n; i++) {
@@ -78,7 +80,13 @@ export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number, t?: nu
     }
     return {coverTime, endVertex: curVertex};
 }
+export const stationaryProbabilityVectorCheck = (normalAdjacencyMatrix: number[][], StationaryProbabilityVector: number[]) => {
+    let vectorToCheck = matrixMulVector(normalAdjacencyMatrix, StationaryProbabilityVector).getColumn(0);
+    vectorToCheck = vectorToCheck.map((value => parseFloat(value.toFixed(MAX_FLOATING_NUMBER))));
 
+    return arraysEqual(toFixVector(vectorToCheck), StationaryProbabilityVector)
+
+}
 export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
     let sum = 0;
     let vectorIndex = -1;
@@ -101,12 +109,8 @@ export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]
     const eigenvectors = res.eigenvectorMatrix;
 
     let pi = eigenvectors.getColumn(vectorIndex)
-    pi.map((i) => sum += i);
 
-    pi = pi.map(value => {
-        return parseFloat((value / sum).toFixed(MAX_FLOATING_NUMBER));
-    })
-    return pi;
+    return getNormalizedVector(pi).map((value => parseFloat(value.toFixed(MAX_FLOATING_NUMBER))));
 }
 
 export const getProbabilityVector = (n: number, index: number) => {
@@ -124,9 +128,9 @@ export const pageRank = ({
                              vertex,
                              t,
                          }: { graph: CompactAdjacencyMatrix, vertex: number, t: number }): void => {
-    for (let j = 0; j < N_Values.length; j++) {
+    for (const element of N_Values) {
         const visitedArray = new Array(graph.getMatrixSize()).fill(0);
-        const N = N_Values[j];
+        const N = element;
 
         for (let i = 0; i < t; i++) {
             const res = randomWalk(graph, vertex, N);
@@ -144,9 +148,9 @@ export const powerIteration = ({
                                    graph,
                                    delta,
                                    t, initVector
-                               }: { graph: CompactAdjacencyMatrix, delta: number, t: number, initVector?: Matrix }): Matrix => {
-    let initialU = initVector || getRandomVector(graph.getMatrixSize()).transpose();
-    const A = new Matrix(graph.getMatrix());
+                               }: { graph: number[][], delta: number, t: number, initVector?: Matrix }): Matrix => {
+    let initialU = initVector || getRandomVector(graph.length, 1).transpose();
+    const A = new Matrix(graph);
     let v: Matrix;
 
     let currentU = initialU;
@@ -155,8 +159,7 @@ export const powerIteration = ({
     for (let i = 0; i < t; i++) {
         v = A.mmul(currentU);
 
-        const norma = getVectorNorma(v.getColumn(0));
-        nextU = v.divide(norma);
+        nextU = new Matrix([getNormalizedVector(v.getColumn(0))]).transpose()
         if (isDistanceBetweenTwoVectorsSmallerThen(nextU, currentU, delta)) {
             break;
         }
@@ -166,25 +169,46 @@ export const powerIteration = ({
     return nextU;
 }
 
+export const getEigenvalue = (matrix: number[][], eigenvector: Matrix): number => {
+    const A = new Matrix(matrix);
+    const resVector = new Array(matrix.length);
+    const eigenvectorV = eigenvector.getColumn(0);
+
+    const mulRes = A.mmul(eigenvector).getColumn(0);
+
+    for (let i = 0; i < mulRes.length; i++) {
+        resVector[i] = mulRes[i] / eigenvectorV[i] || 0;
+    }
+
+    return resVector[0];
+}
 
 
 export const generalizedPowerIteration = async ({
                                                     graph,
                                                     delta,
                                                     kBiggestEigenvector
-                                                }: { graph: CompactAdjacencyMatrix, delta: number, kBiggestEigenvector: number }) => {
+                                                }: { graph: CompactAdjacencyMatrix, delta: number, kBiggestEigenvector: number }): Promise<number> => {
     const spanU: number[][] = [];
-    const V = powerIteration({graph, delta, t: 10000});
+
+    const normalizedAdjacencyMatrix = getNormalAdjacencyMatrix(graph)
+    const V = powerIteration({graph: normalizedAdjacencyMatrix, delta, t: 1000});
+
+    if (kBiggestEigenvector === 0) {
+        return getEigenvalue(normalizedAdjacencyMatrix, V);
+    }
     spanU.push(V.getColumn(0));
 
     let W = getRandomVector(graph.getMatrixSize()).transpose();
 
     let projWOnSpan = getVectorProjectionOnSpan((spanU), W).transpose();
+
     let curU = W.sub(projWOnSpan);
+
     let curV = curU;
 
     for (let i = 0; i < kBiggestEigenvector; i++) {
-        curU = powerIteration({graph, delta, t: 50, initVector: curV});
+        curU = powerIteration({graph: normalizedAdjacencyMatrix, delta, t: 1000000, initVector: curV});
         spanU.push(curU.getColumn(0));
         const orthogonalBasisOfSpanU = await gramSchmidtAlgo(spanU);
         projWOnSpan = getVectorProjectionOnSpan((orthogonalBasisOfSpanU), W).transpose();
@@ -192,5 +216,5 @@ export const generalizedPowerIteration = async ({
         curV = W.sub(projWOnSpan);
     }
 
-    return curV;
+    return getEigenvalue(normalizedAdjacencyMatrix, curV);
 }

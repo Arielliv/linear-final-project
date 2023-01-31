@@ -1,5 +1,5 @@
-export const getRandomNumber = (max: number): number => {
-    return Math.floor(Math.random() * max);
+export const getRandomNumber = (max: number, min = 0): number => {
+    return Math.floor(Math.random() * (max - min) + min);
 };
 
 export const arraysEqual = (a, b) => {

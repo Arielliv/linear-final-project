@@ -1,6 +1,7 @@
 // cliqueGraph experiments:
 import {generalizedPowerIteration} from "../Utils/graphUtils";
 import {algoRunParams} from "../types/types";
+import {Delta_Values} from "../Constants/Constants";
 
 export const PowerIterationRun = ({
                                       cliqueGraph,
@@ -9,34 +10,39 @@ export const PowerIterationRun = ({
                                       doubleCliqueLinkedByPathGraph
                                   }: algoRunParams) => {
     //3.
-    generalizedPowerIteration({graph: cliqueGraph, delta: 0.25, kBiggestEigenvector: 0}).then((res) => {
-        console.log(`cliqueGraph: powerIteration result: ${res}`);
-        console.log('\n');
-    });
+    for (const element of Delta_Values) {
+        generalizedPowerIteration({graph: cliqueGraph, delta: element, kBiggestEigenvector: 0}).then((res) => {
+            console.log(`cliqueGraph: powerIteration result: ${res}`);
+            console.log('\n');
+        });
 
 
 // ringGraph experiments:
-    generalizedPowerIteration({graph: ringGraph, delta: 0.25, kBiggestEigenvector: 0}).then((res) => {
-        console.log(`ringGraph: powerIteration result: ${res}`);
-        console.log('\n');
-    });
+        generalizedPowerIteration({graph: ringGraph, delta: element, kBiggestEigenvector: 0}).then((res) => {
+            console.log(`ringGraph: powerIteration result: ${res}`);
+            console.log('\n');
+        });
 
 
 // lollipopGraph experiments:
-    generalizedPowerIteration({graph: lollipopGraph, delta: 0.25, kBiggestEigenvector: 0}).then((res) => {
-        console.log(`lollipopGraph: powerIteration result: ${res}`);
-        console.log('\n');
-    });
+        generalizedPowerIteration({
+            graph: lollipopGraph,
+            delta: element,
+            kBiggestEigenvector: 0
+        }).then((res) => {
+            console.log(`lollipopGraph: powerIteration result: ${res}`);
+            console.log('\n');
+        });
 
 
 // doubleCliqueLinkedByPathGraph experiments:
-    generalizedPowerIteration({
-        graph: doubleCliqueLinkedByPathGraph,
-        delta: 0.25,
-        kBiggestEigenvector: 0
-    }).then((res) => {
-        console.log(`doubleCliqueLinkedByPathGraph: powerIteration result: ${res}`);
-        console.log('\n');
-    });
-
+        generalizedPowerIteration({
+            graph: doubleCliqueLinkedByPathGraph,
+            delta: element,
+            kBiggestEigenvector: 0
+        }).then((res) => {
+            console.log(`doubleCliqueLinkedByPathGraph: powerIteration result: ${res}`);
+            console.log('\n');
+        });
+    }
 }

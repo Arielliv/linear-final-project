@@ -15,13 +15,13 @@ const lollipopGraph = createLollipopGraph(MAX_NUMBER);
 
 
 //1.
-CoverTimeRun({cliqueGraph, doubleCliqueLinkedByPathGraph, ringGraph, lollipopGraph})
+// CoverTimeRun({cliqueGraph, doubleCliqueLinkedByPathGraph, ringGraph, lollipopGraph})
 
 //2
 PageRankRun({cliqueGraph, doubleCliqueLinkedByPathGraph, ringGraph, lollipopGraph})
 
 //3
-PowerIterationRun({cliqueGraph, doubleCliqueLinkedByPathGraph, ringGraph, lollipopGraph});
+// PowerIterationRun({cliqueGraph, doubleCliqueLinkedByPathGraph, ringGraph, lollipopGraph});
 
 
 
