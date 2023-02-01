@@ -6,90 +6,61 @@ import {
 
 import {MAX_NUMBER} from "../Constants/Constants";
 import {algoRunParams} from "../types/types";
-import {arraysEqual} from "../Utils/utils";
-import {matrixMulVector} from "../Utils/linearUtils";
 
 export const PageRankRun = ({
-                                cliqueGraph,
-                                ringGraph,
-                                lollipopGraph,
-                                doubleCliqueLinkedByPathGraph
+                                graph,
+                                graphIndex
                             }: algoRunParams) => {
     let normalAdjacencyMatrix;
     let StationaryProbabilityVector;
-    let checkVector;
+
 //2.a
-// cliqueGraph experiments:
-//     console.log('cliqueGraph:');
+    // cliqueGraph experiments:
+    // ringGraph experiments:
+    // lollipopGraph experiments:
+    // doubleCliqueLinkedByPathGraph experiments:
+    if (graphIndex === 0) {
+        console.log('cliqueGraph:');
+    } else if (graphIndex === 1) {
+        console.log('ringGraph:');
+    } else if (graphIndex === 2) {
+        console.log('lollipopGraph:');
+    } else if (graphIndex === 3) {
+        console.log('doubleCliqueLinkedByPathGraph:');
+    }
 
-    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(cliqueGraph);
-    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
 
-    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
+    normalAdjacencyMatrix = getNormalAdjacencyMatrix(graph);
+    StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
 
-// ringGraph experiments:
-//     console.log('ringGraph:');
-
-    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(ringGraph);
-    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
-
-    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
-
-// lollipopGraph experiments:
-//     console.log('lollipopGraph:');
-
-    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(lollipopGraph);
-    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
-
-    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
-
-// doubleCliqueLinkedByPathGraph experiments:
-//     console.log('doubleCliqueLinkedByPathGraph:');
-
-    // normalAdjacencyMatrix = getNormalAdjacencyMatrix(doubleCliqueLinkedByPathGraph);
-    // StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
-
-    // console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    // console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix,StationaryProbabilityVector )}\n`);
+    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
+    console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix, StationaryProbabilityVector)}\n`);
 
 //2.b
-// cliqueGraph experiments:
-    console.log('cliqueGraph:');
+    // cliqueGraph experiments:
+    // ringGraph experiments:
+    // lollipopGraph experiments:
+    // doubleCliqueLinkedByPathGraph experiments:
+    if (graphIndex === 0) {
+        console.log('cliqueGraph:');
+    } else if (graphIndex === 1) {
+        console.log('ringGraph:');
+    } else if (graphIndex === 2) {
+        console.log('lollipopGraph:');
+    } else if (graphIndex === 3) {
+        console.log('doubleCliqueLinkedByPathGraph:');
+    }
 
-    pageRank({graph: cliqueGraph, vertex: 0, t: 10000});
+    if (graphIndex === 0 || graphIndex === 1) {
+        // cliqueGraph experiments:
+        // ringGraph experiments:
+        pageRank({graph, vertex: 0, t: 10000});
 
-    console.log('\n');
+        console.log('\n');
 
-// ringGraph experiments:
-    console.log('ringGraph:');
-
-    pageRank({graph: ringGraph, vertex: 0, t: 10000});
-
-    console.log('\n');
-
-// lollipopGraph experiments:
-    console.log('lollipopGraph:');
-
-    pageRank({graph: lollipopGraph, vertex: 0, t: 10000});
-
-    console.log('\n');
-
-    pageRank({graph: lollipopGraph, vertex: MAX_NUMBER - 1, t: 10000});
-
-    console.log('\n');
-
-// doubleCliqueLinkedByPathGraph experiments:
-    console.log('doubleCliqueLinkedByPathGraph:');
-
-    pageRank({graph: doubleCliqueLinkedByPathGraph, vertex: 0, t: 10000});
-
-    console.log('\n');
-
-    pageRank({graph: doubleCliqueLinkedByPathGraph, vertex: MAX_NUMBER - 1, t: 10000});
-
-    console.log('\n');
-
+    } else if (graphIndex === 2 || graphIndex === 3) {
+        pageRank({graph, vertex: 0, t: 10000});
+        console.log('\n');
+        pageRank({graph, vertex: MAX_NUMBER - 1, t: 10000});
+    }
 }

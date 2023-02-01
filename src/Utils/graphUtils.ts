@@ -2,7 +2,7 @@ import {CompactAdjacencyMatrix} from "../CompactAdjacencyMatrix/CompactAdjacency
 import {arraysEqual, getRandomNumber} from "./utils";
 import {BigNumber} from "big-integer";
 import {EigenvalueDecomposition, Matrix} from "ml-matrix";
-import {MAX_FLOATING_NUMBER, N_Values} from "../Constants/Constants";
+import {MAX_FLOATING_NUMBER, MAX_NUMBER, N_Values} from "../Constants/Constants";
 import {
     getNormalizedVector,
     getRandomVector,
@@ -12,32 +12,50 @@ import {
     isDistanceBetweenTwoVectorsSmallerThen, matrixMulVector
 } from "./linearUtils";
 import bigInt = require("big-integer");
+import {createCliqueGraph} from "../Graphs/Clique";
+import {createDoubleCliqueLinkedByPathGraph} from "../Graphs/DoubleCliqueLinkedByPath";
+import {createRingGraph} from "../Graphs/Ring";
+import {createLollipopGraph} from "../Graphs/Lollipop";
 
 
+export const getGraphByNumber = (index: number): CompactAdjacencyMatrix => {
+    if (index === 0) {
+        return createCliqueGraph(MAX_NUMBER);
+    } else if (index === 1) {
+        return createRingGraph(MAX_NUMBER);
+    } else if (index === 2) {
+        return createLollipopGraph(MAX_NUMBER);
+    } else if (index === 3) {
+        return createDoubleCliqueLinkedByPathGraph(MAX_NUMBER);
+    } else {
+        console.log('wrong graph index');
+    }
+}
 
 export const createClique = (graph: CompactAdjacencyMatrix, offset: number, n: number) => {
     for (let i = offset; i < n; i++) {
         for (let y = offset; y < n; y++) {
             graph.addEdge(i, y);
-            graph.addEdge(y, i);
         }
     }
+
     return graph;
 }
 
 export const creatPath = (graph: CompactAdjacencyMatrix, offset: number, n: number) => {
-    for (let i = offset; i < n - 1; i++) {
-        graph.addEdge(i, i + 1);
-        graph.addEdge(i + 1, i);
-        graph.addEdge(i, i);
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            if ((i + 1 === j) || (i === j + 1) || (i === j)) {
+                graph.addEdge(i, j);
+            }
+        }
     }
-    graph.addEdge(n - 1, n - 1);
 
     return graph;
 }
 
-const isVisitedAll = (visitedArray: number[]): boolean => {
-    return visitedArray.filter((isVertexVisited) => isVertexVisited === 0).length === 0
+const isVisitedAll = (visitedArray: boolean[]): boolean => {
+    return visitedArray.every((isVertexVisited) => isVertexVisited);
 };
 
 export const getNormalAdjacencyMatrix = (graph: CompactAdjacencyMatrix): number[][] => {
@@ -63,23 +81,22 @@ export const getNormalAdjacencyMatrix = (graph: CompactAdjacencyMatrix): number[
 export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number, t?: number): { coverTime: BigNumber, endVertex: number } => {
     let coverTime = bigInt(1);
 
-    let curNeighbors: number[];
     let nextVertex: number;
     let nextVertexPlaceInNeighborsArray;
     let curVertex = vertex;
-    const visitedArray = new Array(graph.getMatrixSize()).fill(0);
-    visitedArray[curVertex] = 1;
+    const visitedArray: boolean[] = new Array(graph.getMatrixSize()).fill(false);
+    visitedArray[curVertex] = true;
 
     while (!isVisitedAll(visitedArray) && coverTime.valueOf() != t) {
-        curNeighbors = graph.getNeighbors(curVertex);
-        nextVertexPlaceInNeighborsArray = getRandomNumber(curNeighbors.length);
-        nextVertex = curNeighbors[nextVertexPlaceInNeighborsArray];
-        visitedArray[nextVertex] = 1;
+        nextVertexPlaceInNeighborsArray = getRandomNumber(graph.getNeighborsSize(curVertex));
+        nextVertex = graph.getNeighborByIndex(curVertex, nextVertexPlaceInNeighborsArray);
+        visitedArray[nextVertex] = true;
         curVertex = nextVertex;
         coverTime = coverTime.add(1);
     }
     return {coverTime, endVertex: curVertex};
 }
+
 export const stationaryProbabilityVectorCheck = (normalAdjacencyMatrix: number[][], StationaryProbabilityVector: number[]) => {
     let vectorToCheck = matrixMulVector(normalAdjacencyMatrix, StationaryProbabilityVector).getColumn(0);
     vectorToCheck = vectorToCheck.map((value => parseFloat(value.toFixed(MAX_FLOATING_NUMBER))));
@@ -87,6 +104,7 @@ export const stationaryProbabilityVectorCheck = (normalAdjacencyMatrix: number[]
     return arraysEqual(toFixVector(vectorToCheck), StationaryProbabilityVector)
 
 }
+
 export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
     let sum = 0;
     let vectorIndex = -1;
