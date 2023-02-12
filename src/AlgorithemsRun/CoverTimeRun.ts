@@ -19,7 +19,7 @@ export const CoverTimeRun = ({
         for (let i = 0; i < 10; i++) {
             let result = randomWalk(graph, 0);
             sum = sum.add(result.coverTime);
-            console.log(`randomWalk (run number #${i}): ${result.coverTime}`);
+            console.log(`randomWalk (run number #${i}): ${result.coverTime}\n`);
 
         }
         console.log(`avg.: ${sum.divide(10)}\n`);
@@ -33,10 +33,10 @@ export const CoverTimeRun = ({
             let result2 = randomWalk(graph, MAX_NUMBER - 1);
             sum = sum.add(result1.coverTime);
             sum2 = sum2.add(result2.coverTime)
-            console.log(`randomWalk (run number #${i}) when vertex is 0: ${result1.coverTime}`);
-            console.log(`randomWalk (run number #${i}) when vertex is ${MAX_NUMBER - 1}: ${result2.coverTime}`);
+            console.log(`randomWalk (run number #${i}) when vertex is 0: ${result1.coverTime}\n`);
+            console.log(`randomWalk (run number #${i}) when vertex is ${MAX_NUMBER - 1}: ${result2.coverTime}\n`);
         }
-        console.log(`avg.: ${sum.divide(10)}`);
+        console.log(`avg.: ${sum.divide(10)}\n`);
         console.log(`avg.: ${sum2.divide(10)}\n`);
         sum = bigInt(0);
         sum2 = bigInt(0);

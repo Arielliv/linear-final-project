@@ -1,6 +1,7 @@
 export class CompactAdjacencyMatrix {
     private readonly matrix: number[][];
     private readonly neighbors: number[][];
+    private numOfEdges: number = 0;
 
     constructor(private n: number) {
         this.matrix = new Array(n);
@@ -15,6 +16,7 @@ export class CompactAdjacencyMatrix {
     public addEdge(i: number, j: number): void {
         this.matrix[i][j] = 1;
         this.neighbors[i].push(j);
+        this.numOfEdges++;
     }
 
     public isEdgeExists(i: number, j: number): boolean {
@@ -39,6 +41,10 @@ export class CompactAdjacencyMatrix {
 
     public getNeighborByIndex(vertex: number, index: number): number {
         return this.getNeighbors(vertex)[index];
+    }
+
+    public getSumOfDegrees(): number {
+        return this.numOfEdges;
     }
 
     public edges(): string {

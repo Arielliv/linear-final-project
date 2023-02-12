@@ -1,7 +1,6 @@
 import {
     getNormalAdjacencyMatrix,
-    getStationaryProbabilityVector,
-    pageRank, stationaryProbabilityVectorCheck, toFixVector
+    pageRank, stationaryProbabilityVectorCheck, getStationaryProbabilityVector
 } from "../Utils/graphUtils";
 
 import {MAX_NUMBER} from "../Constants/Constants";
@@ -12,7 +11,7 @@ export const PageRankRun = ({
                                 graphIndex
                             }: algoRunParams) => {
     let normalAdjacencyMatrix;
-    let StationaryProbabilityVector;
+    let stationaryProbabilityVector;
 
 //2.a
     // cliqueGraph experiments:
@@ -31,10 +30,10 @@ export const PageRankRun = ({
 
 
     normalAdjacencyMatrix = getNormalAdjacencyMatrix(graph);
-    StationaryProbabilityVector = getStationaryProbabilityVector(normalAdjacencyMatrix);
+    stationaryProbabilityVector = getStationaryProbabilityVector(graph, normalAdjacencyMatrix, graphIndex);
 
-    console.log(`StationaryProbabilityVector, with size: ${StationaryProbabilityVector.length} , [${StationaryProbabilityVector}]`);
-    console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix, StationaryProbabilityVector)}\n`);
+    console.log(`StationaryProbabilityVector, with size: ${stationaryProbabilityVector.length} , [${stationaryProbabilityVector}]\n`);
+    console.log(`StationaryProbabilityVector is eq: ${stationaryProbabilityVectorCheck(normalAdjacencyMatrix, stationaryProbabilityVector)}\n`);
 
 //2.b
     // cliqueGraph experiments:
@@ -54,13 +53,13 @@ export const PageRankRun = ({
     if (graphIndex === 0 || graphIndex === 1) {
         // cliqueGraph experiments:
         // ringGraph experiments:
-        pageRank({graph, vertex: 0, t: 10000});
+        pageRank({graph, vertex: 0, t: 100000, stationaryProbabilityVector});
 
         console.log('\n');
 
     } else if (graphIndex === 2 || graphIndex === 3) {
-        pageRank({graph, vertex: 0, t: 10000});
+        pageRank({graph, vertex: 0, t: 100000, stationaryProbabilityVector});
         console.log('\n');
-        pageRank({graph, vertex: MAX_NUMBER - 1, t: 10000});
+        pageRank({graph, vertex: MAX_NUMBER - 1, t: 100000, stationaryProbabilityVector});
     }
 }

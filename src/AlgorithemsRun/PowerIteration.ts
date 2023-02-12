@@ -13,7 +13,14 @@ export const PowerIterationRun = ({
     // doubleCliqueLinkedByPathGraph experiments:
     for (const element of Delta_Values) {
         generalizedPowerIteration({graph, delta: element, kBiggestEigenvector: 0}).then((res) => {
-            console.log(`cliqueGraph: powerIteration result: ${res}`);
+            console.log(`cliqueGraph: first vector powerIteration result: ${res}\n`);
+            console.log('\n');
+        });
+    }
+
+    for (const element of Delta_Values) {
+        generalizedPowerIteration({graph, delta: element, kBiggestEigenvector: 1}).then((res) => {
+            console.log(`cliqueGraph: second vector powerIteration result: ${res}\n`);
             console.log('\n');
         });
     }

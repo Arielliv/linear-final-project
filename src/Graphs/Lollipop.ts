@@ -3,7 +3,7 @@ import {createClique, creatPath} from "../Utils/graphUtils";
 
 
 export const createLollipopGraph = (n: number) => {
-    console.log('creating LollipopGraph');
+    console.log('creating LollipopGraph...');
     let graph = new CompactAdjacencyMatrix(n);
     const pathLimit = Math.floor(n / 2);
 
@@ -26,6 +26,5 @@ export const createLollipopGraph = (n: number) => {
     //
     //     }
     // }
-
     return graph;
 }

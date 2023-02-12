@@ -15,17 +15,17 @@ export const getVectorNorma = (initVector: number[]) => {
     return Math.sqrt(sum);
 }
 
-export const getNormalizedVector =(initVector: number[])=> {
+export const getNormalizedVector = (initVector: number[]): number[] => {
     const initVectorNorma = getVectorNorma(initVector);
     const A = new Matrix([initVector]);
 
     return A.divide(initVectorNorma).getRow(0);
 }
 
-export const getRandomVector = (n: number, min= 0): Matrix => {
+export const getRandomVector = (n: number, min = 0): Matrix => {
     const randomVector = [];
     for (let i = 0; i < n; i++) {
-        randomVector.push(getRandomNumber(n,min));
+        randomVector.push(getRandomNumber(n, min));
     }
     return new Matrix([randomVector]);
 }

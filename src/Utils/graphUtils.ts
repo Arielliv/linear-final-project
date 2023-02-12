@@ -2,11 +2,10 @@ import {CompactAdjacencyMatrix} from "../CompactAdjacencyMatrix/CompactAdjacency
 import {arraysEqual, getRandomNumber} from "./utils";
 import {BigNumber} from "big-integer";
 import {EigenvalueDecomposition, Matrix} from "ml-matrix";
-import {MAX_FLOATING_NUMBER, MAX_NUMBER, N_Values} from "../Constants/Constants";
+import {Delta_Values, MAX_FLOATING_NUMBER, MAX_NUMBER, N_Values} from "../Constants/Constants";
 import {
     getNormalizedVector,
     getRandomVector,
-    getVectorNorma,
     getVectorProjectionOnSpan,
     gramSchmidtAlgo,
     isDistanceBetweenTwoVectorsSmallerThen, matrixMulVector
@@ -55,7 +54,7 @@ export const creatPath = (graph: CompactAdjacencyMatrix, offset: number, n: numb
 }
 
 const isVisitedAll = (visitedArray: boolean[]): boolean => {
-    return visitedArray.every((isVertexVisited) => isVertexVisited);
+    return visitedArray.every(Boolean);
 };
 
 export const getNormalAdjacencyMatrix = (graph: CompactAdjacencyMatrix): number[][] => {
@@ -94,6 +93,7 @@ export const randomWalk = (graph: CompactAdjacencyMatrix, vertex: number, t?: nu
         curVertex = nextVertex;
         coverTime = coverTime.add(1);
     }
+
     return {coverTime, endVertex: curVertex};
 }
 
@@ -104,8 +104,25 @@ export const stationaryProbabilityVectorCheck = (normalAdjacencyMatrix: number[]
     return arraysEqual(toFixVector(vectorToCheck), StationaryProbabilityVector)
 
 }
+export const getStationaryProbabilityVector = (graph: CompactAdjacencyMatrix, normalAdjacencyMatrix: number[][], graphIndex: number): number[] => {
+    const stationaryProbabilityVector = new Array(normalAdjacencyMatrix.length);
+    if (graphIndex === 0 || graphIndex === 1) {
+        const vertexVal = parseFloat((1 / normalAdjacencyMatrix.length).toFixed(MAX_FLOATING_NUMBER));
+        stationaryProbabilityVector.fill(vertexVal);
+    } else {
+        const sum = graph.getSumOfDegrees();
 
-export const getStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
+        for (let i = 0; i < normalAdjacencyMatrix.length; i++) {
+            stationaryProbabilityVector[i] = parseFloat((graph.getNeighbors(i).length / sum).toFixed(MAX_FLOATING_NUMBER))
+        }
+    }
+    return stationaryProbabilityVector;
+};
+
+/**
+ * @deprecated
+ */
+export const DeprecatedGetStationaryProbabilityVector = (normalAdjacencyMatrix: number[][]): number[] => {
     let sum = 0;
     let vectorIndex = -1;
 
@@ -145,18 +162,34 @@ export const pageRank = ({
                              graph,
                              vertex,
                              t,
-                         }: { graph: CompactAdjacencyMatrix, vertex: number, t: number }): void => {
-    for (const element of N_Values) {
-        const visitedArray = new Array(graph.getMatrixSize()).fill(0);
-        const N = element;
+                             stationaryProbabilityVector
+                         }: { graph: CompactAdjacencyMatrix, vertex: number, t: number, stationaryProbabilityVector: number[] }): void => {
 
-        for (let i = 0; i < t; i++) {
-            const res = randomWalk(graph, vertex, N);
-            visitedArray[res.endVertex]++;
+    let i;
+    for (const delta of Delta_Values) {
+        for (const element of N_Values) {
+            let shouldGetOut = false;
+            const visitedArray: number[] = new Array(graph.getMatrixSize()).fill(0);
+            const N = element;
+            i = 1;
+
+            while (i <= 100 || !shouldGetOut) {
+                for (let y = 1; y <= t; y++) {
+                    const res = randomWalk(graph, vertex, N);
+                    visitedArray[res.endVertex]++;
+                }
+
+                if (isDistanceBetweenTwoVectorsSmallerThen(new Matrix([stationaryProbabilityVector]), new Matrix([visitedArray.map((a) => parseFloat((a / (i * t)).toFixed(MAX_FLOATING_NUMBER)))]), delta)) {
+                    console.log('got in isDistanceBetweenTwoVectorsSmallerThen\n');
+                    shouldGetOut = true;
+                    break;
+                }
+                i++;
+            }
+
+            // console.log(`histograma of pagerank with N=${N} : [${visitedArray}]`)
+            console.log(`histograma of pagerank with N=${N} with delta D=${delta} : histograma[${visitedArray.map((a) => parseFloat((a / (i * t)).toFixed(MAX_FLOATING_NUMBER)))}]\n`)
         }
-
-        console.log(`histograma of pagerank with N=${N} : [${visitedArray}]`)
-        console.log(`histograma of pagerank with N=${N} : [${visitedArray.map((a) => a / t)}]`)
     }
 
 }
